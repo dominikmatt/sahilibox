@@ -2,7 +2,8 @@ var init = false;
 
 $.fn.sahilibox = function(options){
     var options = $.extend({
-        containerId: '#sahilibox'
+        containerId: '#sahilibox',
+        showThumbnails: 6
     }, options);
     
     var sb = {
@@ -11,6 +12,11 @@ $.fn.sahilibox = function(options){
         curImage: '',
         galleryDescription: [],
         curGalleryName: '',
+        pag : {
+            itemWidth: 0,
+            containerWidth: 0,
+            curIndex: 0
+        },
     
         init: function() 
         {
@@ -93,6 +99,7 @@ $.fn.sahilibox = function(options){
             sb.setCurrentImage($element);
             sb.loadGalleryByName(galleryName);
             sb.setGalleryImages();
+            sb.initPagination();
                
             sb.showOverlay();
             
@@ -105,6 +112,10 @@ $.fn.sahilibox = function(options){
             $('#sahilibox').show().animate({
                 opacity: '1'
             }, 500);
+            
+            $(window).bind('resize', function() {
+               sb.resizePagination(); 
+            });
         },
         
         hideOverlay: function() 
@@ -114,6 +125,8 @@ $.fn.sahilibox = function(options){
             }, 500, function() {
                 $(this).hide();
             });
+            
+            $(window).unbind('resize');
         },
         
         loadGalleryByName: function(name) 
@@ -138,9 +151,16 @@ $.fn.sahilibox = function(options){
         {
             //clear navigation
             $(options.containerId + ' .pagination ul').html('');
-        
+            sb.curImage.addClass('sb-active');
+            
             //set all navigation images
             $.each(sb.curGallery, function(i, image) {
+                
+                //check if this index is the cur image
+                if($(this).hasClass('sb-active')) {
+                    sb.pag.curIndex = i;
+                }
+            
                 var imagePath = $(this).attr('href');
                 $(options.containerId + ' .pagination ul').append('<li data-index="' + i + '"><img src="' + imagePath + '" alt=""></li>');
             });
@@ -160,9 +180,94 @@ $.fn.sahilibox = function(options){
         changeImage: function(event, $element)
         {
             var index = $element.data('index');
+            
+            //set current index
+            sb.pag.curIndex = index;
+            
             console.log(sb.curGallery[index].attr('href'));
             
             $(options.containerId + ' .content .image').html('<img src="' + sb.curGallery[index].attr('href') + '" alt="">');
+        },
+        
+        initPagination: function()
+        {
+            $(options.containerId + ' .pagination img').last().load(function() {
+                var pagWidth = $(options.containerId + ' .pagination').width();
+                var itemWidth = (pagWidth / options.showThumbnails);
+                var pagContainerWidth = itemWidth * sb.curGallery.length;
+                
+                sb.pag.itemWidth = itemWidth;
+                sb.pag.containerWidth = pagContainerWidth;
+                
+                $(options.containerId + ' .pagination li').css({
+                    width: itemWidth + 'px'
+                });
+                
+                $(options.containerId + ' .pagination ul').css({
+                    width:  pagContainerWidth + 'px'
+                });
+                
+                $(options.containerId + ' .next').bind('click', function(event) {
+                    sb.nextImage(event);
+                });
+                
+                $(options.containerId + ' .prev').bind('click', function(event) {
+                    sb.prevImage(event);
+                });
+                
+            }); 
+        },
+        
+        resizePagination: function() 
+        {
+            var pagWidth = $(options.containerId + ' .pagination').width();
+            var itemWidth = (pagWidth / options.showThumbnails);
+            var pagContainerWidth = itemWidth * sb.curGallery.length;
+            
+            sb.pag.itemWidth = itemWidth;
+            sb.pag.containerWidth = pagContainerWidth;
+            
+            $(options.containerId + ' .pagination li').css({
+                width: itemWidth + 'px'
+            });
+            
+            $(options.containerId + ' .pagination ul').css({
+                width:  pagContainerWidth + 'px'
+            });
+        },
+        
+        nextImage: function(event)
+        {
+            var curIndex = sb.pag.curIndex;
+            var nextIndex = curIndex+1;
+            var $pagLi = $(options.containerId + ' .pagination li');
+            
+            if($pagLi.length > nextIndex) {
+                var nextImage = $pagLi.get(nextIndex);
+                sb.changeImage(event, $(nextImage));
+                sb.slidePaginationToIndex(nextIndex);
+            }
+        },
+        
+        prevImage: function(event)
+        {
+            var curIndex = sb.pag.curIndex;
+            var nextIndex = curIndex-1;
+            var $pagLi = $(options.containerId + ' .pagination li');
+            
+            if(nextIndex >= 0) {
+                var nextImage = $pagLi.get(nextIndex);
+                sb.changeImage(event, $(nextImage));
+                sb.slidePaginationToIndex(nextIndex);
+            }
+        },
+        
+        slidePaginationToIndex: function(index) {
+            var marginLeft = sb.pag.itemWidth*index;
+            console.log(marginLeft);
+            $(options.containerId + ' .pagination ul').stop().animate({
+                marginLeft: marginLeft + 'px'
+            }, 500);
         }
         
     };

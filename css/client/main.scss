@@ -18,13 +18,19 @@
         position: absolute;
         z-index: 2;
         width: 600px;
+        max-width: 100%;
         top: 10px;
         left: 50%;
         margin-left: -300px;
         
+        @media all and (max-width: 600px) {
+            left: 0;
+            margin-left: 0;   
+        }
+        
         .content {
             background-color: #fff;
-            padding: 30px;
+            padding: 0px;
         }
         
         .image {
@@ -68,6 +74,20 @@
             img {
                 width: 100%;
             }
+        }
+        
+        .prev {
+            position: absolute;
+            width: 20px;
+            left: -20px;
+            bottom: 25px;
+        }
+        
+        .next {
+            position: absolute;
+            width: 20px;
+            right: -30px;
+            bottom: 25px;
         }
         
         
