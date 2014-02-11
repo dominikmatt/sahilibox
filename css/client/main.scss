@@ -75,13 +75,17 @@
             h2 {
                 display: block;
                 width: 185px;
-                color: @titleColor;
-                .ArialNarrowBold(22, 24);
+                color: #00400D;
+                font-family: 'Arial Narrow'; 
+                font-size: 22px;
+                line-height: 24px;
                 margin: 30px 20px 20px 20px;
             }
             
             p {
-                .Arial(13, 20);
+                font-family: 'Arial';
+                font-size: 13px;
+                line-height: 20px;
                 margin: 0 20px;
             }
             
@@ -94,7 +98,9 @@
             
             .button {
                 display: block;
-                .Arial(13,28);
+                font-family: 'Arial';
+                font-size: 13px;
+                line-height: 28px;
                 -webkit-font-smoothing: antialiased;
                 text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
                 width: 140px;

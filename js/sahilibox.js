@@ -29,6 +29,7 @@ $.fn.sahilibox = function(options){
         curImage: '',
         galleryDescription: [],
         curGalleryName: '',
+        addedGalleryItems: [],
         pag : {
             itemWidth: 0,
             containerWidth: 0,
@@ -117,7 +118,7 @@ $.fn.sahilibox = function(options){
             sb.curGalleryName = galleryName;
             sb.setCurrentImage($element);
             sb.loadGalleryByName(galleryName);
-            sb.setGalleryImages();
+            sb.setGalleryImages(false);
             sb.initPagination();
                
             sb.showOverlay();
@@ -167,6 +168,14 @@ $.fn.sahilibox = function(options){
                     sb.curGallery.push($(this));
                 }
             });
+            
+            
+            if((name in sb.addedGalleryItems) && sb.addedGalleryItems.length) {
+                $.each(sb.addedGalleryItems[name], function() {
+                    sb.curGallery.push($(this));
+                });
+            }
+            
         },
         
         setCurrentImage: function($element)
@@ -177,40 +186,49 @@ $.fn.sahilibox = function(options){
         /*
         * Put pictures and description in the overlay
         */
-        setGalleryImages: function()
+        setGalleryImages: function(ajax)
         {
             //clear navigation
             $(options.containerId + ' .pagination ul').html('');
-            sb.curImage.addClass('sb-active');
+            if(ajax == false) {
+                sb.curImage.addClass('sb-active');
+            }
             
             var addClass = '';
             //set all navigation images
             $.each(sb.curGallery, function(i, image) {
                 
                 addClass = '';
-                //check if this index is the cur image
-                if($(this).hasClass('sb-active')) {
-                    sb.pag.curIndex = i;
-                    addClass = ' sb-active';
-                    sb.slidePaginationToIndex(i);
-                    sb.changeImageBefore(i);
+                if(ajax == false) {
+                    //check if this index is the cur image
+                    if($(this).hasClass('sb-active')) {
+                        sb.pag.curIndex = i;
+                        addClass = ' sb-active';
+                        sb.slidePaginationToIndex(i);
+                        sb.changeImageBefore(i);
+                    }
+                } else {
+                    if(i == sb.pag.curIndex) {
+                        addClass = ' sb-active';
+                    }
                 }
-            
                 var imagePath = $(this).attr('href');
                 $(options.containerId + ' .pagination ul').append('<li class="' + addClass + '" data-index="' + i + '"><img src="' + imagePath + '" alt=""><div class="border"></div></li>');
             });
             
-            //show current image
-            var curImagePath = sb.curImage.attr('href');
-            $(options.containerId + ' .content .image').html('<img src="' + curImagePath + '" alt="">').find('img').load(function() {
-                sb.changeImageLoaded($(this));
-            });
-            
-            //set gallery description
-            if(sb.galleryDescription[sb.curGalleryName] != undefined) {
-                $(options.containerId + ' .content .description').html(sb.galleryDescription[sb.curGalleryName]);
-            } else {
-                $(options.containerId + ' .content .description').html('');
+            if(ajax == false) {
+                //show current image
+                var curImagePath = sb.curImage.attr('href');
+                $(options.containerId + ' .content .image').html('<img src="' + curImagePath + '" alt="">').find('img').load(function() {
+                    sb.changeImageLoaded($(this));
+                });
+                
+                //set gallery description
+                if(sb.galleryDescription[sb.curGalleryName] != undefined) {
+                    $(options.containerId + ' .content .description').html(sb.galleryDescription[sb.curGalleryName]);
+                } else {
+                    $(options.containerId + ' .content .description').html('');
+                }
             }
         },
         
@@ -387,6 +405,26 @@ $.fn.sahilibox = function(options){
         addDescription: function(galleryName, description)
         {
             sb.galleryDescription[galleryName] = description;
+        },
+        
+        add: function(name, path) 
+        {
+            if(!(name in sb.addedGalleryItems)) {
+                sb.addedGalleryItems.push(name);
+                sb.addedGalleryItems[name] = [];
+            }
+            var image = $('<a/>', {
+                            href: path,
+                            style: 'display: none'
+                        });
+            sb.addedGalleryItems[name].push(image);
+        },
+        
+        reload: function()
+        {
+            sb.loadGalleryByName(sb.curGalleryName);
+            sb.setGalleryImages(true);
+            sb.resizePagination();
         }
     };
     

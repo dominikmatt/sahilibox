@@ -58,6 +58,12 @@
                    }
                });
                sahilibox.addDescription('test', '<h2>TEST TITEL</h2><p>TESTDESCRIPTION</p><div class="desc-bottom"><a href="#" class="button">Anfrage senden &raquo;</a></div>');
+               sahilibox.add('test1', 'img/3.jpg');
+               sahilibox.add('test1', 'img/2.jpg');
+               setInterval(function() {
+                   sahilibox.add('test1', 'img/2.jpg');
+                   sahilibox.reload();
+               }, 2000);
             });
         </script>
     </body>
