@@ -1,14 +1,26 @@
 /**
  * SAHILIBOX 
  *
+ * VERSION 0.1.0
+ *
+ * CAHNGELOG
+ * 
+ * VERSION 1.0
+ * - ADDED: DEFAULT THEME
+ * - ADDED: OVERLAY
+ * - ADDED: PAGINATION
+ * - ADDED: PLUGIN CORE
+ *
  * author Dominik Matt <dma@massiveart.com>
  */
 var init = false;
 
 $.fn.sahilibox = function(options){
-    var options = $.extend({
+    options = $.extend({
         containerId: '#sahilibox',
-        showThumbnails: 6
+        showThumbnails: 6,
+        changeImageLoaded: function(element) {},
+        changeImageBefore: function(index) {}
     }, options);
     
     var sb = {
@@ -140,6 +152,8 @@ $.fn.sahilibox = function(options){
             });
             
             $(window).unbind('resize');
+            $(options.containerId + ' .next').unbind('click');
+            $(options.containerId + ' .prev').unbind('click');
         },
         
         /*
@@ -179,6 +193,7 @@ $.fn.sahilibox = function(options){
                     sb.pag.curIndex = i;
                     addClass = ' sb-active';
                     sb.slidePaginationToIndex(i);
+                    sb.changeImageBefore(i);
                 }
             
                 var imagePath = $(this).attr('href');
@@ -187,7 +202,9 @@ $.fn.sahilibox = function(options){
             
             //show current image
             var curImagePath = sb.curImage.attr('href');
-            $(options.containerId + ' .content .image').html('<img src="' + curImagePath + '" alt="">');
+            $(options.containerId + ' .content .image').html('<img src="' + curImagePath + '" alt="">').find('img').load(function() {
+                sb.changeImageLoaded($(this));
+            });
             
             //set gallery description
             if(sb.galleryDescription[sb.curGalleryName] != undefined) {
@@ -203,6 +220,9 @@ $.fn.sahilibox = function(options){
         changeImage: function(event, $element)
         {
             var index = $element.data('index');
+            
+            sb.changeImageBefore(index);
+            
             $(options.containerId + ' .pagination li').removeClass('sb-active');
             $element.addClass('sb-active');
             
@@ -211,7 +231,9 @@ $.fn.sahilibox = function(options){
             
             sb.slidePaginationToIndex(index);
             
-            $(options.containerId + ' .content .image').html('<img src="' + sb.curGallery[index].attr('href') + '" alt="">');
+            $(options.containerId + ' .content .image').html('<img src="' + sb.curGallery[index].attr('href') + '" alt="">').find('img').load(function() {
+                sb.changeImageLoaded($(this));
+            });
         },
         
         /*
@@ -274,7 +296,6 @@ $.fn.sahilibox = function(options){
         {
             var curIndex = sb.pag.curIndex;
             var nextIndex = curIndex+1;
-            console.log(curIndex + ' - ' + nextIndex);
             var $pagLi = $(options.containerId + ' .pagination li');
             
             if($pagLi.length > nextIndex) {
@@ -290,7 +311,6 @@ $.fn.sahilibox = function(options){
         {
             var curIndex = sb.pag.curIndex;
             var nextIndex = curIndex-1;
-            console.log(curIndex + ' - ' + nextIndex);
             var $pagLi = $(options.containerId + ' .pagination li');
             
             if(nextIndex >= 0) {
@@ -320,6 +340,36 @@ $.fn.sahilibox = function(options){
             $(options.containerId + ' .pagination ul').stop().animate({
                 marginLeft: marginLeft + 'px'
             }, 500);
+        },
+        
+        /*
+         * this function is calling after the image is changed and loaded
+         */
+        changeImageLoaded: function(element)
+        {
+            options.changeImageLoaded(element);
+        },
+        
+        /*
+         * this function is called before the image is changed
+         */
+        changeImageBefore: function(index)
+        {
+            options.changeImageBefore(index);
+            
+            //hide/show next button when the last item is selected
+            if(sb.curGallery.length == (index+1)) {
+                $(options.containerId + ' .next').animate({ 'opacity': '0'}, 500);
+            } else {
+                $(options.containerId + ' .next').animate({ 'opacity': '1'}, 500);
+            }
+            
+            //hide/show prev button when first item is selected
+            if(index == 0) {
+                $(options.containerId + ' .prev').animate({ 'opacity': '0'}, 500);
+            } else {
+                $(options.containerId + ' .prev').animate({ 'opacity': '1'}, 500);
+            }
         }
         
     };

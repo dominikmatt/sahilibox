@@ -39,15 +39,26 @@
         }
         
         .image {
+            position: relative;
             display: inline-block;
             zoom: 1;
             *display: inline;
             width: 70%;
             vertical-align: top;
             width: 640px;
+            height: 480px;
             line-height: 0;
+            background-color: #000;
+            overflow: hidden;
+            text-align: center;
+            vertical-align: middle;
             
             img {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                margin-left: -320px;
+                margin-top: -240px;
                 width: 100%;
             }
         }
@@ -104,11 +115,14 @@
         }
         
         .pagination {
+            *position: relative;
             background-color: #000;
             margin-top: 20px;
             overflow: hidden;
             
             ul {
+                display: block;
+                zoom: 1;
                 list-style: none;
                 padding: 0;
                 margin: 0;
@@ -122,6 +136,8 @@
                 margin: 0;
                 line-height: 0;
                 cursor: pointer;
+                max-height: 94px;
+                overflow: hidden;
                 
                 .border {
                     display: none;
@@ -185,3 +201,6 @@
         
     }
 }
+
+
+
