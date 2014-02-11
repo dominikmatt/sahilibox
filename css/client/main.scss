@@ -1,11 +1,11 @@
 #sahilibox {
-    z-index: 99999;
+    z-index: 999;
     display: none;
     opacity: 0;
     
     .overlay-bg {
         position: fixed;
-        z-index: 1;
+        z-index: 9999;
         top: 0;
         left: 0;
         width: 100%;
@@ -15,22 +15,27 @@
     }
     
     .overlay {
-        position: absolute;
-        z-index: 2;
-        width: 600px;
+        position: fixed;
+        z-index: 99999;
+        width: 960px;
         max-width: 100%;
-        top: 10px;
+        bottom: 50%;
         left: 50%;
-        margin-left: -300px;
+        margin-left: -480px;
+        margin-bottom: -311px;
         
-        @media all and (max-width: 600px) {
+        @media all and (max-width: 960px) {
             left: 0;
             margin-left: 0;   
         }
         
         .content {
+            width: 100%;
+            min-height: 0;
             background-color: #fff;
             padding: 0px;
+            margin: 0;
+            border: 0;
         }
         
         .image {
@@ -39,6 +44,8 @@
             *display: inline;
             width: 70%;
             vertical-align: top;
+            width: 640px;
+            line-height: 0;
             
             img {
                 width: 100%;
@@ -49,8 +56,51 @@
             display: inline-block;
             zoom: 1;
             *display: inline;
-            width: 29%;
+            width: 30%;
+            height: 100%;
             vertical-align: top;
+            line-height: 0;
+            
+            h2 {
+                display: block;
+                width: 185px;
+                color: @titleColor;
+                .ArialNarrowBold(22, 24);
+                margin: 30px 20px 20px 20px;
+            }
+            
+            p {
+                .Arial(13, 20);
+                margin: 0 20px;
+            }
+            
+            .desc-bottom {
+                position: absolute;
+                bottom: 10px;
+                right: 0;
+                width: 30%;
+            }
+            
+            .button {
+                display: block;
+                .Arial(13,28);
+                -webkit-font-smoothing: antialiased;
+                text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
+                width: 140px;
+                text-align: center;
+                color: #fff;
+                background: #d00018;
+                background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…EiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+                background: -moz-linear-gradient(top, #d00018 0%, #a90013 100%);
+                background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d00018), color-stop(100%, #a90013));
+                background: -webkit-linear-gradient(top, #d00018 0%, #a90013 100%);
+                background: -o-linear-gradient(top, #d00018 0%, #a90013 100%);
+                background: -ms-linear-gradient(top, #d00018 0%, #a90013 100%);
+                background: linear-gradient(to bottom, #d00018 0%, #a90013 100%);
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#d00018', endColorstr='#a90013', GradientType=0);
+                border: none;
+                border-radius: 2px;
+            }
         }
         
         .pagination {
@@ -65,10 +115,29 @@
             }
             
             li {
+                position: relative;
                 float: left;
                 width: 100px;
                 padding: 0;
                 margin: 0;
+                line-height: 0;
+                cursor: pointer;
+                
+                .border {
+                    display: none;
+                }
+                
+                &.sb-active {
+                    .border {
+                        display: block;
+                        position: absolute;
+                        top: 5px;
+                        right: 5px;
+                        bottom: 5px;
+                        left: 5px;
+                        border: 1px solid #fff;
+                    }
+                }
             }
             
             img {
@@ -78,16 +147,39 @@
         
         .prev {
             position: absolute;
-            width: 20px;
-            left: -20px;
-            bottom: 25px;
+            width: 35px;
+            height: 30px;
+            left: -35px;
+            bottom: 35px;
+            background-image: url('/website/themes/hoval/img/sl-prev.png');
+            background-position: left center;
+            background-repeat: no-repeat;
+            cursor: pointer;
         }
         
         .next {
             position: absolute;
+            width: 35px;
+            height: 30px;
+            right: -40px;
+            bottom: 35px;
+            background-image: url('/website/themes/hoval/img/sl-next.png');
+            background-position: left center;
+            background-repeat: no-repeat;
+            cursor: pointer;
+        }
+        
+        .close {
+            z-index: 999;
+            position: absolute;
+            right: 20px;
+            bottom: 10px;
             width: 20px;
-            right: -30px;
-            bottom: 25px;
+            height: 20px;
+            background-image: url('/website/themes/hoval/img/sl-close-grey.png');
+            background-position: left center;
+            background-repeat: no-repeat;
+            cursor: pointer;
         }
         
         

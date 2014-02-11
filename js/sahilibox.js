@@ -1,3 +1,8 @@
+/**
+ * SAHILIBOX 
+ *
+ * author Dominik Matt <dma@massiveart.com>
+ */
 var init = false;
 
 $.fn.sahilibox = function(options){
@@ -21,7 +26,11 @@ $.fn.sahilibox = function(options){
         init: function() 
         {
             //load overlay template
-            sb.tmpl['overlay'] = sb.loadTemplate('overlay', 'initOverlay');
+            if($(options.containerId).length == 0) {
+                sb.tmpl['overlay'] = sb.loadTemplate('overlay', 'initOverlay');
+            } else {
+                sb.setEvents();
+            }
             
             //search for galleries
             sb.gallerySearch();
@@ -31,8 +40,12 @@ $.fn.sahilibox = function(options){
         setEvents: function()
         {
             $(options.containerId + ' .pagination').delegate('li', 'click', function(event) {
-                console.log('test');
                 sb.changeImage(event, $(this));
+            });
+            
+            /* close overlay */
+            $(options.containerId + ' .close, ' + options.containerId + ' .overlay-bg').on('click', function() {
+                sb.hideOverlay();
             });
         },
         
@@ -64,12 +77,7 @@ $.fn.sahilibox = function(options){
         initOverlay: function()
         {
             $('body').append(sb.tmpl['overlay'].responseText);
-            
-            $('#sahilibox .close, #sahilibox .overlay-bg').on('click', function() {
-                sb.hideOverlay();
-            });
-            
-            sb.setEvents()
+            sb.setEvents();
         },
         
         /*
@@ -80,7 +88,6 @@ $.fn.sahilibox = function(options){
             $('a').each(function(i, value) {
                 var $element = $(this);
                 if($element.data('sahilibox') != undefined) {
-                    
                     $element.on('click', function(event) {
                         sb.openBox(event, $element);
                     });
@@ -107,9 +114,12 @@ $.fn.sahilibox = function(options){
             return false;
         },
         
+        /*
+         * open the overlay in a fade-in animation
+         */
         showOverlay: function()
         {
-            $('#sahilibox').show().animate({
+            $(options.containerId).show().animate({
                 opacity: '1'
             }, 500);
             
@@ -118,9 +128,12 @@ $.fn.sahilibox = function(options){
             });
         },
         
+        /*
+         * close the overlay in a fade-out animation
+         */
         hideOverlay: function() 
         {
-            $('#sahilibox').animate({
+            $(options.containerId).animate({
                 opacity: '0'
             }, 500, function() {
                 $(this).hide();
@@ -129,6 +142,9 @@ $.fn.sahilibox = function(options){
             $(window).unbind('resize');
         },
         
+        /*
+         * get all images for the gallery with this name
+         */
         loadGalleryByName: function(name) 
         {
             sb.curGallery = [];
@@ -153,16 +169,20 @@ $.fn.sahilibox = function(options){
             $(options.containerId + ' .pagination ul').html('');
             sb.curImage.addClass('sb-active');
             
+            var addClass = '';
             //set all navigation images
             $.each(sb.curGallery, function(i, image) {
                 
+                addClass = '';
                 //check if this index is the cur image
                 if($(this).hasClass('sb-active')) {
                     sb.pag.curIndex = i;
+                    addClass = ' sb-active';
+                    sb.slidePaginationToIndex(i);
                 }
             
                 var imagePath = $(this).attr('href');
-                $(options.containerId + ' .pagination ul').append('<li data-index="' + i + '"><img src="' + imagePath + '" alt=""></li>');
+                $(options.containerId + ' .pagination ul').append('<li class="' + addClass + '" data-index="' + i + '"><img src="' + imagePath + '" alt=""><div class="border"></div></li>');
             });
             
             //show current image
@@ -177,18 +197,26 @@ $.fn.sahilibox = function(options){
             }
         },
         
+        /*
+         * change a image when we call the next or prev navigation or we click on a pagination item
+         */
         changeImage: function(event, $element)
         {
             var index = $element.data('index');
+            $(options.containerId + ' .pagination li').removeClass('sb-active');
+            $element.addClass('sb-active');
             
             //set current index
             sb.pag.curIndex = index;
             
-            console.log(sb.curGallery[index].attr('href'));
+            sb.slidePaginationToIndex(index);
             
             $(options.containerId + ' .content .image').html('<img src="' + sb.curGallery[index].attr('href') + '" alt="">');
         },
         
+        /*
+         * calculate the pagination item width and set the click events for the next and prev navigation
+         */
         initPagination: function()
         {
             $(options.containerId + ' .pagination img').last().load(function() {
@@ -218,6 +246,9 @@ $.fn.sahilibox = function(options){
             }); 
         },
         
+        /*
+         * that we ar responsive we must resize the pagination
+         */
         resizePagination: function() 
         {
             var pagWidth = $(options.containerId + ' .pagination').width();
@@ -236,35 +267,56 @@ $.fn.sahilibox = function(options){
             });
         },
         
+        /*
+         * next navigation
+         */
         nextImage: function(event)
         {
             var curIndex = sb.pag.curIndex;
             var nextIndex = curIndex+1;
+            console.log(curIndex + ' - ' + nextIndex);
             var $pagLi = $(options.containerId + ' .pagination li');
             
             if($pagLi.length > nextIndex) {
                 var nextImage = $pagLi.get(nextIndex);
                 sb.changeImage(event, $(nextImage));
-                sb.slidePaginationToIndex(nextIndex);
             }
         },
         
+        /*
+         * prev navigation
+         */
         prevImage: function(event)
         {
             var curIndex = sb.pag.curIndex;
             var nextIndex = curIndex-1;
+            console.log(curIndex + ' - ' + nextIndex);
             var $pagLi = $(options.containerId + ' .pagination li');
             
             if(nextIndex >= 0) {
                 var nextImage = $pagLi.get(nextIndex);
                 sb.changeImage(event, $(nextImage));
-                sb.slidePaginationToIndex(nextIndex);
             }
         },
         
+        /*
+         * will calculate the center item in the navigation and then the function will do the animation
+         */
         slidePaginationToIndex: function(index) {
-            var marginLeft = sb.pag.itemWidth*index;
-            console.log(marginLeft);
+            //calculate the first image of the pagination
+            var firstIndex = (index-parseInt(options.showThumbnails/2));
+            
+            //if we are smaller then 0
+            if(firstIndex < 0) {
+                firstIndex = 0;
+            // if there ist not more items in the pagination
+            } else if(firstIndex > (sb.curGallery.length-options.showThumbnails)) {
+                firstIndex = sb.curGallery.length-options.showThumbnails;
+            }
+            
+            //calculate the margin left of the pagination and make a animation to this point
+            var marginLeft = -(sb.pag.itemWidth*firstIndex);
+            
             $(options.containerId + ' .pagination ul').stop().animate({
                 marginLeft: marginLeft + 'px'
             }, 500);
@@ -284,7 +336,6 @@ $.fn.sahilibox = function(options){
         
         addDescription: function(galleryName, description)
         {
-            console.log(init);
             sb.galleryDescription[galleryName] = description;
         }
     };
@@ -293,4 +344,3 @@ $.fn.sahilibox = function(options){
     
     
 };
-
