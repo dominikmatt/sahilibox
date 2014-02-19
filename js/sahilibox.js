@@ -1,7 +1,7 @@
 /**
  * SAHILIBOX 
  *
- * VERSION 0.1.0
+ * VERSION 0.1.1
  *
  * CAHNGELOG
  * 
@@ -132,9 +132,7 @@ $.fn.sahilibox = function(options){
          */
         showOverlay: function()
         {
-            $(options.containerId).show().animate({
-                opacity: '1'
-            }, 500);
+            $(options.containerId).fadeIn(500);
             
             $(window).bind('resize', function() {
                sb.resizePagination(); 
@@ -148,11 +146,7 @@ $.fn.sahilibox = function(options){
         {
             $('a').removeClass('sb-active');
         
-            $(options.containerId).animate({
-                opacity: '0'
-            }, 500, function() {
-                $(this).hide();
-            });
+            $(options.containerId).fadeOut(500);
             
             $(window).unbind('resize');
             $(options.containerId + ' .next').unbind('click');
@@ -215,7 +209,8 @@ $.fn.sahilibox = function(options){
                     }
                 }
                 var imagePath = $(this).attr('href');
-                $(options.containerId + ' .pagination ul').append('<li class="' + addClass + '" data-index="' + i + '"><img src="' + imagePath + '" alt=""><div class="border"></div></li>').find('img').load(function() {
+                $(options.containerId + ' .pagination ul').append('<li class="' + addClass + '" data-index="' + i + '"><img src="' + imagePath + '" alt="" style="display: none"><div class="border"></div></li>').find('img').load(function() {
+                    $(this).show();
                     sb.slidePaginationToIndex(sb.pag.curIndex);
                 });
             });
@@ -223,7 +218,8 @@ $.fn.sahilibox = function(options){
             if(ajax == false) {
                 //show current image
                 var curImagePath = sb.curImage.attr('href');
-                $(options.containerId + ' .content .image').html('<img src="' + curImagePath + '" alt="">').find('img').load(function() {
+                $(options.containerId + ' .content .image').html('<img src="' + curImagePath + '" alt="" style="display: none">').find('img').load(function() {
+                    sb.hideLoaderAndShowImage($(this));
                     sb.changeImageLoaded($(this));
                 });
                 
@@ -255,9 +251,15 @@ $.fn.sahilibox = function(options){
             
             sb.slidePaginationToIndex(index);
             
-            $(options.containerId + ' .content .image').html('<img src="' + sb.curGallery[index].attr('href') + '" alt="">').find('img').load(function() {
+            $(options.containerId + ' .content .image').html('<img src="' + sb.curGallery[index].attr('href') + '" alt="" style="display: none">').find('img').load(function() {
+                sb.hideLoaderAndShowImage($(this));
                 sb.changeImageLoaded($(this));
             });
+        },
+        
+        hideLoaderAndShowImage: function($element)
+        {
+            $element.fadeIn();
         },
         
         /*
@@ -268,7 +270,7 @@ $.fn.sahilibox = function(options){
             $(options.containerId + ' .pagination img').last().load(function() {
                 var pagWidth = $(options.containerId + ' .pagination').width();
                 var itemWidth = (pagWidth / options.showThumbnails);
-                var pagContainerWidth = itemWidth * sb.curGallery.length;
+                var pagContainerWidth = (itemWidth * sb.curGallery.length)+10;
                 
                 sb.pag.itemWidth = itemWidth;
                 sb.pag.containerWidth = pagContainerWidth;
@@ -360,10 +362,17 @@ $.fn.sahilibox = function(options){
             
             //calculate the margin left of the pagination and make a animation to this point
             var marginLeft = -(sb.pag.itemWidth*firstIndex);
-            
-            $(options.containerId + ' .pagination ul').stop().animate({
-                marginLeft: marginLeft + 'px'
-            }, 500);
+
+            //check if the gallery has more items then we show in the thumbnail
+            if(sb.curGallery.length > options.showThumbnails) {
+                $(options.containerId + ' .pagination ul').stop().animate({
+                    marginLeft: marginLeft + 'px'
+                }, 500);
+            } else {
+                $(options.containerId + ' .pagination ul').stop().animate({
+                    marginLeft: '0'
+                }, 500);
+            }
         },
         
         /*
