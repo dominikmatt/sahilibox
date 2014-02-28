@@ -20,6 +20,8 @@ $.fn.sahilibox = function(options){
     options = $.extend({
         containerId: '#sahilibox',
         showThumbnails: 6,
+        touchEvents: true,
+        keyboardEvents: true,
         changeImageLoaded: function($element, index) {},
         changeImageBefore: function($element, index) {},
         imageDataChanged: function($element, index) {}
@@ -122,11 +124,16 @@ $.fn.sahilibox = function(options){
             sb.curGalleryName = galleryName;
             sb.setCurrentImage($element);
             sb.loadGalleryByName(galleryName);
-            sb.setGalleryImages(false);
-            sb.initPagination();
-               
-            sb.showOverlay();
+            if(sb.curGallery.length <= 0) {
+                sb.hideOverlay();
+                sb.closeBox();
+                console.log('no images are set on sahilibox: ' + galleryName);
+            } else {
+                sb.setGalleryImages(false);
+                sb.initPagination();
             
+                sb.showOverlay();
+            }
             //enable body scrolling
             $('body').css('overflow', 'hidden');
             
@@ -138,6 +145,9 @@ $.fn.sahilibox = function(options){
         {
             //disable body scrolling
             $('body').css('overflow', 'auto');
+             if(options.keyboardEvents == true) {
+                 $(document).off("keydown");
+             }
         },
         
         /*
@@ -146,6 +156,9 @@ $.fn.sahilibox = function(options){
         showOverlay: function()
         {
             $(options.containerId).fadeIn(500);
+            if(options.keyboardEvents == true) {
+                sb.initKeyboardControl();
+            }
             
             $(window).bind('resize', function() {
                sb.resizePagination(); 
@@ -173,7 +186,7 @@ $.fn.sahilibox = function(options){
         {
             sb.curGallery = [];
             $('a').each(function(i, value) {
-                if($(this).data('sahilibox') == name) {
+                if($(this).data('sahilibox') == name && $(this).attr('href') != '#') {
                     sb.curGallery.push($(this));
                 }
             });
@@ -204,6 +217,7 @@ $.fn.sahilibox = function(options){
             }
             
             var addClass = '';
+            
             //set all navigation images
             $.each(sb.curGallery, function(i, image) {
                 
@@ -263,7 +277,7 @@ $.fn.sahilibox = function(options){
                 
                 sb.changeImageData(index);
                 
-                sb.changeImageBefore(index);
+                sb.changeImageBefore($element, index);
                 
                 $(options.containerId + ' .pagination li').removeClass('sb-active');
                 $element.addClass('sb-active');
@@ -332,9 +346,39 @@ $.fn.sahilibox = function(options){
                     sb.prevImage(event);
                 });
                 
-                sb.initPaginationTouch();
+                if(options.touchEvents == true) {
+                    sb.initPaginationTouch();
+                }
                 
             }); 
+        },
+        
+        initKeyboardControl: function() 
+        {
+            $(document).on('keydown', function(e) {
+                var nextIndex = null;
+                if(e.which == 37 || e.which == 40) {
+                    nextIndex = sb.pag.curIndex-1;
+                    if(nextIndex <= 0) {
+                        nextIndex = 0;
+                    }
+                } else if(e.which == 39 || e.which == 38) {
+                    nextIndex = sb.pag.curIndex+1;
+                    if(nextIndex >= sb.curGallery.length) {
+                        nextIndex = sb.curGallery.length-1;
+                    }
+                } else if(e.which == 27) {
+                    sb.hideOverlay();
+                    sb.closeBox();
+                }
+                
+                
+                if(nextIndex != null) {
+                    var $pagLi = $(options.containerId + ' .pagination li');
+                    var nextImage = $pagLi.get(nextIndex);
+                    sb.changeImage(event, $(nextImage));
+                }
+            });
         },
         
         initPaginationTouch: function() 
@@ -346,7 +390,6 @@ $.fn.sahilibox = function(options){
                 }
 
                 var marginLeft = parseInt($(options.containerId + ' .pagination ul').css('margin-left'))-(sb.lastTouchPosition-x);
-                console.log(marginLeft);
                 
                 if(marginLeft > 0) {
                     marginLeft = 0;
@@ -465,22 +508,26 @@ $.fn.sahilibox = function(options){
         /*
          * this function is called before the image is changed
          */
-        changeImageBefore: function(index)
+        changeImageBefore: function($element, index)
         {
-            options.changeImageBefore(index);
-            
+            options.changeImageBefore($element, index);
+
             //hide/show next button when the last item is selected
-            if(sb.curGallery.length == (index+1)) {
-                $(options.containerId + ' .next').animate({ 'opacity': '0'}, 500);
+            if(sb.curGallery.length == (index+1) || sb.curGallery.length == 0 || sb.curGallery.length == 1) {
+                if($(options.containerId + ' .next').css('opacity') != 0) {
+                    $(options.containerId + ' .next').stop().animate({ 'opacity': '0'}, 500);
+                }
             } else {
-                $(options.containerId + ' .next').animate({ 'opacity': '1'}, 500);
+                $(options.containerId + ' .next').stop().animate({ 'opacity': '1'}, 500);
             }
             
             //hide/show prev button when first item is selected
             if(index == 0) {
-                $(options.containerId + ' .prev').animate({ 'opacity': '0'}, 500);
+                if($(options.containerId + ' .prev').css('opacity') != 0) {
+                    $(options.containerId + ' .prev').stop().animate({ 'opacity': '0'}, 500);
+                }
             } else {
-                $(options.containerId + ' .prev').animate({ 'opacity': '1'}, 500);
+                $(options.containerId + ' .prev').stop().animate({ 'opacity': '1'}, 500);
             }
         }
         
