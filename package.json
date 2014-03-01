@@ -1,0 +1,15 @@
+{
+  "name": "AbererPool",
+  "version": "0.1.0",
+  "author": "Dominik Matt",
+  "private": true,
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-sass": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-cssc": "*",
+    "grunt-htmlhint": "*",
+    "matchdep": "*",
+    "grunt-contrib-compass": "~0.7.0"
+  }
+}

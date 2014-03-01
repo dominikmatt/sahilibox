@@ -357,12 +357,12 @@ $.fn.sahilibox = function(options){
         {
             $(document).on('keydown', function(e) {
                 var nextIndex = null;
-                if(e.which == 37 || e.which == 40) {
+                if(e.which == 37 || e.which == 40) {
                     nextIndex = sb.pag.curIndex-1;
                     if(nextIndex <= 0) {
                         nextIndex = 0;
                     }
-                } else if(e.which == 39 || e.which == 38) {
+                } else if(e.which == 39 || e.which == 38) {
                     nextIndex = sb.pag.curIndex+1;
                     if(nextIndex >= sb.curGallery.length) {
                         nextIndex = sb.curGallery.length-1;
