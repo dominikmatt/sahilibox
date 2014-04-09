@@ -289,17 +289,31 @@ $.fn.sahilibox = function(options){
         
         centerOverlay: function() {
             
-            //var overlayHeight = this.$overlay.height();
+            //reset
+            this.$overlay.find('.image').css({
+                width: 'auto',
+                height: 'auto'
+            });
+            
+            var overlayHeight = this.$overlay.height();
             var winHeight = $(window).height();
             var overlayWidth = this.$overlay.width();
             var winWidth = $(window).width();
             var imageWidth = this.$overlay.find('.image img').width();
             var imageHeight = this.$overlay.find('.image img').height();
             var pagHeight = this.$overlay.find('.pagination').height();
-
+            
+            if(overlayHeight > winHeight) {
+                imageHeight = winHeight-pagHeight-100;
+                this.$overlay.find('.image img').css({
+                    height: imageHeight + 'px'
+                });
+            }
+            
             var top = (imageHeight+pagHeight)/2;
             var left = overlayWidth/2;
-
+            
+            
             if(this.overlayIsOpen) {
                 this.$overlay.stop().animate({
                     marginLeft: -(left) + 'px',
@@ -307,7 +321,6 @@ $.fn.sahilibox = function(options){
                 }, 400);
                 
                 this.$overlay.find('.image').stop().animate({
-                    width: imageWidth + 'px',
                     height: imageHeight + 'px'
                 }, 400);
             } else {
@@ -317,7 +330,6 @@ $.fn.sahilibox = function(options){
                 });
                 
                 this.$overlay.find('.image').css({
-                    width: imageWidth + 'px',
                     height: imageHeight + 'px'
                 });
             }
