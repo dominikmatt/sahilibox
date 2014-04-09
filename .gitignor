@@ -10,6 +10,7 @@
 # SCSS #
 ########
 .sass-cache
+.node_modules/*
 
 # Packages #
 ############
