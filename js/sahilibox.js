@@ -286,17 +286,25 @@ $.fn.sahilibox = function(options){
         
         centerOverlay: function() {
             
-            var overlayHeight = this.$overlay.height();
+            //var overlayHeight = this.$overlay.height();
             var winHeight = $(window).height();
-            var overlayWidth = this.$overlay.width();
+            //var overlayWidth = this.$overlay.width();
             var winWidth = $(window).width();
-            console.log(overlayWidth);
-            var top = overlayHeight/2;
-            var left = overlayWidth/2;
-            console.log('test');
-            this.$overlay.animate({
+            var imageWidth = this.$overlay.find('.image img').width();
+            var imageHeight = this.$overlay.find('.image img').height();
+            var pagHeight = this.$overlay.find('.pagination').height();
+
+            var top = (imageHeight+pagHeight)/2;
+            var left = imageWidth/2;
+
+            this.$overlay.stop().animate({
                 marginLeft: -(left) + 'px',
                 marginTop: -(top) + 'px'
+            }, 400);
+            
+            this.$overlay.find('.image').stop().animate({
+                width: imageWidth + 'px',
+                height: imageHeight + 'px'
             }, 400);
         },
         
