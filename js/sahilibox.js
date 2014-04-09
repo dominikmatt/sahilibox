@@ -37,6 +37,7 @@ $.fn.sahilibox = function(options){
         curGalleryName: '',
         addedGalleryItems: [],
         lastTouchPosition: null,
+        overlayIsOpen: false,
         pag : {
             itemWidth: 0,
             containerWidth: 0,
@@ -160,8 +161,10 @@ $.fn.sahilibox = function(options){
         
         closeBox: function() 
         {
+            this.overlayIsOpen = false;
+        
             //disable body scrolling
-            $('body').css('overflow', 'auto');
+            $('body').css('overflow', 'inherit');
              if(options.keyboardEvents == true) {
                  $(document).off("keydown");
              }
@@ -288,24 +291,37 @@ $.fn.sahilibox = function(options){
             
             //var overlayHeight = this.$overlay.height();
             var winHeight = $(window).height();
-            //var overlayWidth = this.$overlay.width();
+            var overlayWidth = this.$overlay.width();
             var winWidth = $(window).width();
             var imageWidth = this.$overlay.find('.image img').width();
             var imageHeight = this.$overlay.find('.image img').height();
             var pagHeight = this.$overlay.find('.pagination').height();
 
             var top = (imageHeight+pagHeight)/2;
-            var left = imageWidth/2;
+            var left = overlayWidth/2;
 
-            this.$overlay.stop().animate({
-                marginLeft: -(left) + 'px',
-                marginTop: -(top) + 'px'
-            }, 400);
-            
-            this.$overlay.find('.image').stop().animate({
-                width: imageWidth + 'px',
-                height: imageHeight + 'px'
-            }, 400);
+            if(this.overlayIsOpen) {
+                this.$overlay.stop().animate({
+                    marginLeft: -(left) + 'px',
+                    marginTop: -(top) + 'px'
+                }, 400);
+                
+                this.$overlay.find('.image').stop().animate({
+                    width: imageWidth + 'px',
+                    height: imageHeight + 'px'
+                }, 400);
+            } else {
+                this.$overlay.css({
+                    marginLeft: -(left) + 'px',
+                    marginTop: -(top) + 'px'
+                });
+                
+                this.$overlay.find('.image').css({
+                    width: imageWidth + 'px',
+                    height: imageHeight + 'px'
+                });
+            }
+            this.overlayIsOpen = true;
         },
         
         /*
@@ -393,6 +409,7 @@ $.fn.sahilibox = function(options){
                     sb.initPaginationTouch();
                 }
                 if(sb.curGallery.length > 1) {
+                    $(options.containerId + ' .pagination').show();
                     this.centerPaginationItems();
                 } else {
                     $(options.containerId + ' .pagination').hide();
