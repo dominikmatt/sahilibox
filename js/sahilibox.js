@@ -22,6 +22,8 @@ $.fn.sahilibox = function(options){
         showThumbnails: 6,
         touchEvents: true,
         keyboardEvents: true,
+        thumbnailDistance: 0,
+        thumbnailHeight: 60,
         changeImageLoaded: function($element, index) {},
         changeImageBefore: function($element, index) {},
         imageDataChanged: function($element, index) {}
@@ -114,6 +116,9 @@ $.fn.sahilibox = function(options){
             });
         },
         
+        $el: null,
+        $overlay: null,
+        
         /*
         * open the overlay when the user select an image
         */
@@ -121,6 +126,11 @@ $.fn.sahilibox = function(options){
         {
             
             var galleryName = $element.data('sahilibox');
+            this.$el = $(options.containerId);
+            this.$overlay = this.$el.find('.overlay');
+            
+            this.initStyle();
+            
             sb.curGalleryName = galleryName;
             sb.setCurrentImage($element);
             sb.loadGalleryByName(galleryName);
@@ -139,6 +149,13 @@ $.fn.sahilibox = function(options){
             
             event.preventDefault();
             return false;
+        },
+        
+        initStyle: function() {
+            this.$overlay.css({
+                left: '50%',
+                top: '50%' 
+            });
         },
         
         closeBox: function() 
@@ -240,7 +257,7 @@ $.fn.sahilibox = function(options){
                 if($(this).data('title') != '' && $(this).data('title') != undefined) {
                     altTitle = $(this).data('title') ;
                 }
-                $(options.containerId + ' .pagination ul').append('<li class="' + addClass + '" data-index="' + i + '"><img src="' + imagePath + '" alt="' + altTitle + '" style="display: none"><div class="border"></div></li>').find('img').load(function() {
+                $(options.containerId + ' .pagination ul').append('<li class="' + addClass + '" data-index="' + i + '" style="margin-right: ' + options.thumbnailDistance + 'px;"><img src="' + imagePath + '" alt="' + altTitle + '" style="display: none"><div class="active"></div></li>').find('img').load(function() {
                     $(this).show();
                     sb.slidePaginationToIndex(sb.pag.curIndex);
                 });
@@ -253,6 +270,7 @@ $.fn.sahilibox = function(options){
                 $(options.containerId + ' .content .image').html('<img src="' + curImagePath + '" alt="' + sb.curImage.data('title') + '" style="display: none">').find('img').load(function() {
                     sb.hideLoaderAndShowImage($(this));
                     sb.changeImageLoaded($(this), sb.pag.curIndex);
+                    sb.centerOverlay();
                 });
                 
                 //set gallery description
@@ -264,6 +282,22 @@ $.fn.sahilibox = function(options){
             }
             
             
+        },
+        
+        centerOverlay: function() {
+            
+            var overlayHeight = this.$overlay.height();
+            var winHeight = $(window).height();
+            var overlayWidth = this.$overlay.width();
+            var winWidth = $(window).width();
+            console.log(overlayWidth);
+            var top = overlayHeight/2;
+            var left = overlayWidth/2;
+            console.log('test');
+            this.$overlay.animate({
+                marginLeft: -(left) + 'px',
+                marginTop: -(top) + 'px'
+            }, 400);
         },
         
         /*
@@ -290,6 +324,7 @@ $.fn.sahilibox = function(options){
                 $(options.containerId + ' .content .image').html('<img src="' + sb.curGallery[index].attr('href') + '" alt="' + sb.curGallery[index].data('title') + '" style="display: none">').find('img').load(function() {
                     sb.hideLoaderAndShowImage($(this));
                     sb.changeImageLoaded($(this));
+                    sb.centerOverlay();
                 });
             }
         },
@@ -324,8 +359,8 @@ $.fn.sahilibox = function(options){
         {
             $(options.containerId + ' .pagination img').last().load(function() {
                 var pagWidth = $(options.containerId + ' .pagination').width();
-                var itemWidth = (pagWidth / options.showThumbnails);
-                var pagContainerWidth = (itemWidth * sb.curGallery.length)+10;
+                var itemWidth = (pagWidth / options.showThumbnails)-options.thumbnailDistance+(options.thumbnailDistance/sb.curGallery.length);
+                var pagContainerWidth = (itemWidth * sb.curGallery.length)+10+(sb.curGallery.length * options.thumbnailDistance);
                 
                 sb.pag.itemWidth = itemWidth;
                 sb.pag.containerWidth = pagContainerWidth;
@@ -349,8 +384,41 @@ $.fn.sahilibox = function(options){
                 if(options.touchEvents == true) {
                     sb.initPaginationTouch();
                 }
+                if(sb.curGallery.length > 1) {
+                    this.centerPaginationItems();
+                } else {
+                    $(options.containerId + ' .pagination').hide();
+                }
+            }.bind(this)); 
+        },
+        
+        centerPaginationItems: function() {
+            $(options.containerId + ' .pagination li').each(function(i, el) {
                 
-            }); 
+                var $el = $(el);
+                var $img = $el.find('img');
+                var imgHeight = $img.height();
+                
+                //set Thumbail Height
+                $el.css({
+                    height: options.thumbnailHeight,
+                    textAlign: 'center'
+                });
+                
+                if(imgHeight > options.thumbnailHeight) {
+                    $img.css({
+                        width: 'auto',
+                        height: '100%'
+                    });
+                } else {
+                    
+                    var marginTop = (options.thumbnailHeight-imgHeight)/2;
+                
+                    $img.css({
+                        marginTop: marginTop + 'px'
+                    });
+                }
+            }.bind(this));
         },
         
         initKeyboardControl: function() 
@@ -483,7 +551,7 @@ $.fn.sahilibox = function(options){
             }
             
             //calculate the margin left of the pagination and make a animation to this point
-            var marginLeft = -(sb.pag.itemWidth*firstIndex);
+            var marginLeft = -(sb.pag.itemWidth*firstIndex)-(options.thumbnailDistance*firstIndex);
 
             //check if the gallery has more items then we show in the thumbnail
             if(sb.curGallery.length > options.showThumbnails) {

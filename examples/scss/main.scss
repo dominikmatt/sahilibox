@@ -18,10 +18,6 @@
         z-index: 99999;
         width: 640px;
         max-width: 100%;
-        bottom: 50%;
-        left: 50%;
-        margin-left: -320px;
-        margin-bottom: -311px;
         
         @media all and (max-width: 960px) {
             left: 0;
@@ -45,7 +41,6 @@
             width: 70%;
             vertical-align: top;
             width: 640px;
-            height: 480px;
             line-height: 0;
             background-color: #fff;
             overflow: hidden;
@@ -53,11 +48,6 @@
             vertical-align: middle;
             
             img {
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                margin-left: -320px;
-                margin-top: -240px;
                 width: 100%;
             }
         }
@@ -94,34 +84,11 @@
                 right: 0;
                 width: 30%;
             }
-            
-            .button {
-                display: block;
-                font-family: 'Arial';
-                font-size: 13px;
-                line-height: 28px;
-                -webkit-font-smoothing: antialiased;
-                text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
-                width: 140px;
-                text-align: center;
-                color: #fff;
-                background: #d00018;
-                background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…EiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-                background: -moz-linear-gradient(top, #d00018 0%, #a90013 100%);
-                background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d00018), color-stop(100%, #a90013));
-                background: -webkit-linear-gradient(top, #d00018 0%, #a90013 100%);
-                background: -o-linear-gradient(top, #d00018 0%, #a90013 100%);
-                background: -ms-linear-gradient(top, #d00018 0%, #a90013 100%);
-                background: linear-gradient(to bottom, #d00018 0%, #a90013 100%);
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#d00018', endColorstr='#a90013', GradientType=0);
-                border: none;
-                border-radius: 2px;
-            }
+             
         }
         
         .pagination {
             *position: relative;
-            background-color: #fff;
             margin-top: 20px;
             overflow: hidden;
             
@@ -143,20 +110,21 @@
                 cursor: pointer;
                 max-height: 94px;
                 overflow: hidden;
+                background-color: #fff;
                 
-                .border {
+                .active {
                     display: none;
                 }
                 
                 &.sb-active {
-                    .border {
+                    .active {
                         display: block;
                         position: absolute;
-                        top: 5px;
-                        right: 5px;
-                        bottom: 5px;
-                        left: 5px;
-                        border: 1px solid #fff;
+                        top: 0;
+                        right: 0;
+                        bottom: 0;
+                        left: 0;
+                        background-color: rgba(234, 57, 57, 0.1);
                     }
                 }
             }
