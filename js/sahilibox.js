@@ -69,6 +69,10 @@ $.fn.sahilibox = function(options){
                 sb.hideOverlay();
                 sb.closeBox();
             });
+            
+            $(window).bind('resize', function() {
+                this.centerOverlay();
+            }.bind(this));
         },
         
         /*
@@ -288,12 +292,6 @@ $.fn.sahilibox = function(options){
         },
         
         centerOverlay: function() {
-            
-            //reset
-            this.$overlay.find('.image').css({
-                width: 'auto',
-                height: 'auto'
-            });
             
             var overlayHeight = this.$overlay.height();
             var winHeight = $(window).height();
