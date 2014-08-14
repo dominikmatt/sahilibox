@@ -24,6 +24,7 @@ $.fn.sahilibox = function(options){
         keyboardEvents: true,
         thumbnailDistance: 0,
         thumbnailHeight: 60,
+        initStyle: true,
         changeImageLoaded: function($element, index) {},
         changeImageBefore: function($element, index) {},
         imageDataChanged: function($element, index) {}
@@ -157,10 +158,12 @@ $.fn.sahilibox = function(options){
         },
         
         initStyle: function() {
-            this.$overlay.css({
-                left: '50%',
-                top: '50%' 
-            });
+            if(options.initStyle) {
+                this.$overlay.css({
+                    left: '50%',
+                    top: '50%' 
+                });
+            }
         },
         
         closeBox: function() 
@@ -293,7 +296,7 @@ $.fn.sahilibox = function(options){
         
         centerOverlay: function() {
             
-            var overlayHeight = this.$overlay.height();
+            /*var overlayHeight = this.$overlay.height();
             var winHeight = $(window).height();
             var overlayWidth = this.$overlay.width();
             var winWidth = $(window).width();
@@ -330,8 +333,15 @@ $.fn.sahilibox = function(options){
                 this.$overlay.find('.image').css({
                     height: imageHeight + 'px'
                 });
-            }
+            }*/
+            
+            this.resizeImage();
+            
             this.overlayIsOpen = true;
+        },
+        
+        resizeImage: function() {
+            
         },
         
         /*
@@ -355,11 +365,16 @@ $.fn.sahilibox = function(options){
                 
                 sb.slidePaginationToIndex(index);
                 
-                $(options.containerId + ' .content .image').html('<img src="' + sb.curGallery[index].attr('href') + '" alt="' + sb.curGallery[index].data('title') + '" style="display: none">').find('img').load(function() {
-                    sb.hideLoaderAndShowImage($(this));
-                    sb.changeImageLoaded($(this));
-                    sb.centerOverlay();
-                });
+                $(options.containerId + ' .content .image img').animate({
+                    marginLeft: '150px',
+                    opacity: '0'
+                },150, function() {
+                    $(options.containerId + ' .content .image').html('<img src="' + sb.curGallery[index].attr('href') + '" alt="' + sb.curGallery[index].data('title') + '" style="display: none">').find('img').load(function() {
+                        sb.hideLoaderAndShowImage($(this));
+                        sb.changeImageLoaded($(this));
+                        sb.centerOverlay();
+                    });
+                }.bind(this))
             }
         },
         
@@ -383,7 +398,13 @@ $.fn.sahilibox = function(options){
         
         hideLoaderAndShowImage: function($element)
         {
-            $element.fadeIn();
+            $element.css({
+                marginLeft: '150px',
+                opacity: '0'
+            }).show().animate({
+                marginLeft: '0',
+                opacity: '1'
+            }, 150);
         },
         
         /*
@@ -536,7 +557,7 @@ $.fn.sahilibox = function(options){
             });
             
             $(options.containerId + ' .pagination ul').css({
-                width:  pagContainerWidth + 'px'
+                width:  $(window).width() + 'px'
             });
         },
         
@@ -627,10 +648,10 @@ $.fn.sahilibox = function(options){
             //hide/show prev button when first item is selected
             if(index == 0) {
                 if($(options.containerId + ' .prev').css('opacity') != 0) {
-                    $(options.containerId + ' .prev').stop().animate({ 'opacity': '0'}, 500);
+                    $(options.containerId + ' .prev').stop().animate({opacity: '0'}, 500);
                 }
             } else {
-                $(options.containerId + ' .prev').stop().animate({ 'opacity': '1'}, 500);
+                $(options.containerId + ' .prev').stop().animate({opacity: '1'}, 500);
             }
         }
         
